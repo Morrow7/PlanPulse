@@ -1,4 +1,4 @@
-# 997 README
+# PlanPulse README
 
 This is a VScode plugin. We can directly create plans within the plugin, set daily reminders and track progress. When the goals we set are not accomplished, prompts and warnings will be issued.
 
