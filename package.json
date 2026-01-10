@@ -1,5 +1,5 @@
 {
-  "name": "PlanPulse",
+  "name": "planpulse",
   "displayName": "PlanPulse",
   "description": "可以制定项目计划，进行日常提醒和项目追踪，让我们有计划的完成项目，当我们计划的日期到了计划还没有完成时，会发出警告，让我们更有效率的完成项目的开发",
   "version": "0.0.1",
@@ -14,7 +14,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "997.helloWorld",
+        "command": "planpulse.helloWorld",
         "title": "Hello World"
       }
     ]
