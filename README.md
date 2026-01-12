@@ -59,4 +59,4 @@ You can author your README using Visual Studio Code. Here are some useful editor
 * [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
-**Enjoy!**
+**Our skills are not yet proficient. We sincerely hope that all of you can offer your opinions, criticisms and corrections. We hope that our development journey will become increasingly wonderful, and we hope that the PlanPulse plugin will be loved by you all!**
