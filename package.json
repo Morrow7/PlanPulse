@@ -1,7 +1,7 @@
 {
   "name": "planpulse",
   "displayName": "PlanPulse",
-  "publisher": "Morrrow",
+  "publisher": "Morrow",
   "repository": {
     "type": "git",
     "url": "https://github.com/Morrrow/PlanPulse.git"
