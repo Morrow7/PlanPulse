@@ -31,6 +31,10 @@
         {
           "id": "planpulse.planView",
           "name": "我的计划"
+        },
+        {
+          "id": "planpulse.todoView",
+          "name": "待办事项"
         }
       ]
     },
@@ -38,6 +42,11 @@
       {
         "command": "planpulse.addTask",
         "title": "添加计划",
+        "icon": "$(add)"
+      },
+      {
+        "command": "planpulse.addTodo",
+        "title": "添加待办",
         "icon": "$(add)"
       },
       {
@@ -57,6 +66,11 @@
           "command": "planpulse.addTask",
           "when": "view == planpulse.planView",
           "group": "navigation"
+        },
+        {
+          "command": "planpulse.addTodo",
+          "when": "view == planpulse.todoView",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -66,8 +80,18 @@
           "group": "inline"
         },
         {
+          "command": "planpulse.completeTask",
+          "when": "view == planpulse.todoView && viewItem != task-completed",
+          "group": "inline"
+        },
+        {
           "command": "planpulse.deleteTask",
           "when": "view == planpulse.planView",
+          "group": "inline"
+        },
+        {
+          "command": "planpulse.deleteTask",
+          "when": "view == planpulse.todoView",
           "group": "inline"
         }
       ]

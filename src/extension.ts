@@ -6,11 +6,18 @@ let myStatusBarItem: vscode.StatusBarItem;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('PlanPulse is active!');
 
+	
 	myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+	// 为状态栏项目注册命令，点击时聚焦到计划视图
 	myStatusBarItem.command = 'planpulse.planView.focus';
+	// 将状态栏项目添加到订阅列表，确保在扩展停用时被正确释放
 	context.subscriptions.push(myStatusBarItem);
+	// 创建任务管理器实例，传入扩展上下文
 	const taskManager = new TaskManager(context);
-	const taskProvider = new TaskProvider(taskManager);
+
+	// 创建两个 Provider，分别过滤 'plan' 和 'todo'
+	const planProvider = new TaskProvider(taskManager, 'plan');
+	const todoProvider = new TaskProvider(taskManager, 'todo');
 
 	const updateStatusBarItem = () => {
 		const tasks = taskManager.getTasks();
@@ -21,20 +28,21 @@ export function activate(context: vscode.ExtensionContext) {
 			const first = pending[0];
 			const diff = Math.ceil((first.deadline - Date.now()) / 60000);
 
-			myStatusBarItem.text = `$(clock)${first.title}(${diff})`;
+			myStatusBarItem.text = `$(clock)${first.title}(${diff}m)`; // 加个 m 单位更清楚
 			myStatusBarItem.show();
 		} else {
 			myStatusBarItem.hide();
 		}
 	};
 
-	vscode.window.registerTreeDataProvider('planpulse.planView', taskProvider);
+	vscode.window.registerTreeDataProvider('planpulse.planView', planProvider);
+	vscode.window.registerTreeDataProvider('planpulse.todoView', todoProvider); // 注册待办视图
 
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('planpulse.addTask', async () => {
 			const title = await vscode.window.showInputBox({
-				placeHolder: '请输入任务标题',
+				placeHolder: '请输入计划标题',
 				prompt: '例如：完成需求文档'
 			});
 			updateStatusBarItem();
@@ -55,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if (!timeStr) { return; }
 
-			// 解析时间
+			
 			let minutes = 0;
 			// 匹配数字部分和单位部分
 			const match = timeStr.match(/^(\d+(\.\d+)?)\s*(m|min|分钟|h|hour|小时)?$/i);
@@ -75,9 +83,48 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const deadline = new Date(Date.now() + minutes * 60000);
 
-			await taskManager.addTask(title, deadline);
+			await taskManager.addTask(title, deadline, 'plan'); // 明确指定为 'plan'
 			updateStatusBarItem();
-			vscode.window.showInformationMessage(`已添加任务：${title}`);
+			vscode.window.showInformationMessage(`已添加计划：${title}`);
+		})
+	);
+
+	
+	context.subscriptions.push(
+		vscode.commands.registerCommand('planpulse.addTodo', async () => {
+			const title = await vscode.window.showInputBox({
+				placeHolder: '请输入待办事项',
+				prompt: '例如：回复邮件'
+			});
+
+			if (!title) { return; }
+
+			// 待办事项默认给个 1 小时或者不设时间？这里为了统一逻辑，暂时也让用户输个时间，或者默认久一点
+			// 简单起见，这里复用时间输入逻辑，或者我们可以简化待办不需要时间（但这需要改 Task 结构支持可选 deadline）
+			// 为了保持一致性，我们还是让用户输入个截止时间，或者默认 24 小时
+
+			const timeStr = await vscode.window.showInputBox({
+				placeHolder: '多少时间后截止？(支持 m/h)',
+				prompt: '例如：30, 30m, 1h (默认 1小时)',
+			});
+
+			let minutes = 60; // 默认 1 小时
+			if (timeStr) {
+				// 解析时间 (复用之前的逻辑)
+				const match = timeStr.match(/^(\d+(\.\d+)?)\s*(m|min|分钟|h|hour|小时)?$/i);
+				if (match) {
+					const num = parseFloat(match[1]);
+					const unit = match[3];
+					if (!unit || /^m|min|分钟$/i.test(unit)) { minutes = num; }
+					else if (/^h|hour|小时$/i.test(unit)) { minutes = num * 60; }
+				}
+			}
+
+			const deadline = new Date(Date.now() + minutes * 60000);
+
+			await taskManager.addTask(title, deadline, 'todo'); // 明确指定为 'todo'
+			updateStatusBarItem();
+			vscode.window.showInformationMessage(`已添加待办：${title}`);
 		})
 	);
 

@@ -3,28 +3,31 @@ import * as vscode from 'vscode';
 export interface Task {
     id: string;
     title: string;
-    deadline: number; 
+    deadline: number;
     completed: boolean;
+    type?: 'plan' | 'todo'; 
 }
 
 export class TaskManager {
     private static readonly STORAGE_KEY = 'planpulse.tasks';
     private _onDidChangeTasks: vscode.EventEmitter<Task[] | undefined> = new vscode.EventEmitter<Task[] | undefined>();
     readonly onDidChangeTasks: vscode.Event<Task[] | undefined> = this._onDidChangeTasks.event;
- 
-    constructor(private context: vscode.ExtensionContext) {}
+
+    constructor(private context: vscode.ExtensionContext) { }
 
     getTasks(): Task[] {
         return this.context.globalState.get<Task[]>(TaskManager.STORAGE_KEY) || [];
     }
 
-    async addTask(title: string, deadline: Date): Promise<void> {
+    // 修改：增加 type 参数，默认为 'plan'
+    async addTask(title: string, deadline: Date, type: 'plan' | 'todo' = 'plan'): Promise<void> {
         const tasks = this.getTasks();
         const newTask: Task = {
             id: Date.now().toString(),
             title,
             deadline: deadline.getTime(),
-            completed: false
+            completed: false,
+            type: type
         };
         tasks.push(newTask);
         await this.saveTasks(tasks);
