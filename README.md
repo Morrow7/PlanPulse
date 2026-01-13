@@ -83,7 +83,7 @@ Your plans stay **yours**.
 
 ## 🗒️ Release Status
 
-**Current Version:** `0.0.1`  
+**Current Version:** `0.0.2`  
 This is the initial release. Features and improvements will continue to evolve.
 
 ---
